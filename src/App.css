@@ -26,6 +26,7 @@
   display: flex;  
   justify-content: center;
   align-items: center;
+  text-align: center;
 }
 
 .terrain-buttons {
@@ -157,4 +158,101 @@
 
 .level-button.active {
   background-color: #8b0000;
+}
+
+.copy-level-container {
+  display: flex;
+  align-items: center;
+  margin-left: 10px;
+}
+
+.copy-level-select {
+  margin-right: 5px;
+  padding: 5px;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  color: #333;
+}
+
+.copy-level-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-size: 14px;
+  background-color: #2196F3;
+  color: white;
+}
+
+.copy-level-button:hover {
+  background-color: #1976D2;
+}
+
+.utility-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.button-row {
+  display: flex;
+  gap: 10px;
+}
+
+.save-button, .clear-button, .copy-level-button, .load-button, .load-official-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-size: 14px;
+  color: white;
+}
+
+.save-button {
+  background-color: #4CAF50;
+}
+
+.save-button:hover {
+  background-color: #45a049;
+}
+
+.clear-button {
+  background-color: #f44336;
+}
+
+.clear-button:hover {
+  background-color: #d32f2f;
+}
+
+.copy-level-button {
+  background-color: #2196F3;
+}
+
+.copy-level-button:hover {
+  background-color: #1976D2;
+}
+
+.load-button, .load-official-button {
+  background-color: #FF9800;
+}
+
+.load-button:hover, .load-official-button:hover {
+  background-color: #F57C00;
+}
+
+.copy-level-container {
+  display: flex;
+  align-items: center;
+}
+
+.copy-level-select {
+  margin-right: 5px;
+  padding: 5px;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  color: #333;
 }

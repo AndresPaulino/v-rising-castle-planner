@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Stage, Layer, Rect, Text, Line } from 'react-konva';
 
 const CELL_SIZE = 20;
@@ -10,9 +10,11 @@ const GridCanvas = ({ grid, currentLevel, onCellChange, width, height }) => {
   const [isPanning, setIsPanning] = useState(false);
   const [stageScale, setStageScale] = useState(1);
   const [stagePosition, setStagePosition] = useState({ x: 0, y: 0 });
+  const [cursorStyle, setCursorStyle] = useState('default');
+  const [initializedCanvas, setInitializedCanvas] = useState(false);
 
-  useEffect(() => {
-    if (stageRef.current) {
+  const initializeCanvas = useCallback(() => {
+    if (stageRef.current && !initializedCanvas) {
       const stage = stageRef.current;
       const gridWidth = grid[0].length * CELL_SIZE;
       const gridHeight = grid.length * CELL_SIZE;
@@ -31,8 +33,37 @@ const GridCanvas = ({ grid, currentLevel, onCellChange, width, height }) => {
       });
 
       stage.batchDraw();
+      setInitializedCanvas(true);
     }
-  }, [grid, width, height]);
+  }, [grid, width, height, initializedCanvas]);
+
+  useEffect(() => {
+    initializeCanvas();
+  }, [initializeCanvas]);
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, []);
+
+  const handleKeyDown = (e) => {
+    if (e.code === 'Space') {
+      setIsPanning(true);
+      setCursorStyle('grab');
+    }
+  };
+
+  const handleKeyUp = (e) => {
+    if (e.code === 'Space') {
+      setIsPanning(false);
+      setCursorStyle('default');
+    }
+  };
 
   const handleCellChange = (rowIndex, colIndex) => {
     onCellChange(currentLevel, rowIndex, colIndex);
@@ -52,7 +83,9 @@ const GridCanvas = ({ grid, currentLevel, onCellChange, width, height }) => {
   };
 
   const handleMouseDown = (e) => {
-    if (!isPanning) {
+    if (isPanning) {
+      setCursorStyle('grabbing');
+    } else {
       setIsDrawing(true);
       const pos = getGridCoordinates(e.target.getStage().getPointerPosition());
       if (pos.x >= 0 && pos.x < grid[0].length && pos.y >= 0 && pos.y < grid.length) {
@@ -63,13 +96,25 @@ const GridCanvas = ({ grid, currentLevel, onCellChange, width, height }) => {
 
   const handleMouseUp = () => {
     setIsDrawing(false);
+    if (isPanning) {
+      setCursorStyle('grab');
+    }
   };
 
   const handleMouseMove = (e) => {
-    if (!isDrawing || isPanning) return;
-    const pos = getGridCoordinates(e.target.getStage().getPointerPosition());
-    if (pos.x >= 0 && pos.x < grid[0].length && pos.y >= 0 && pos.y < grid.length) {
-      handleCellChange(pos.y, pos.x);
+    const stage = e.target.getStage();
+    if (isPanning) {
+      const dx = e.evt.movementX;
+      const dy = e.evt.movementY;
+      setStagePosition({
+        x: stage.x() + dx,
+        y: stage.y() + dy,
+      });
+    } else if (isDrawing) {
+      const pos = getGridCoordinates(stage.getPointerPosition());
+      if (pos.x >= 0 && pos.x < grid[0].length && pos.y >= 0 && pos.y < grid.length) {
+        handleCellChange(pos.y, pos.x);
+      }
     }
   };
 
@@ -183,10 +228,10 @@ const GridCanvas = ({ grid, currentLevel, onCellChange, width, height }) => {
       onMouseUp={handleMouseUp}
       onMouseMove={handleMouseMove}
       onWheel={handleWheel}
-      draggable={isPanning}
       scale={{ x: stageScale, y: stageScale }}
       x={stagePosition.x}
       y={stagePosition.y}
+      style={{ cursor: cursorStyle }}
     >
       <Layer>
         {renderAxisNumbers()}

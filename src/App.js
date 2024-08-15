@@ -1,4 +1,3 @@
-// src/App.js
 import React, { useState, useEffect } from 'react';
 import GridCanvas from './components/GridCanvas';
 import SaveDialog from './components/SaveDialog/SaveDialog';
@@ -35,21 +34,21 @@ function App() {
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [showClearConfirmDialog, setShowClearConfirmDialog] = useState(false);
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
+  const [sourceLevelToCopy, setSourceLevelToCopy] = useState(LEVELS[0]);
 
-  
-useEffect(() => {
-  const updateCanvasSize = () => {
-    setCanvasSize({
-      width: window.innerWidth,
-      height: window.innerHeight - 150, // Adjust this value based on your toolbar and level selector height
-    });
-  };
+  useEffect(() => {
+    const updateCanvasSize = () => {
+      setCanvasSize({
+        width: window.innerWidth,
+        height: window.innerHeight - 150,
+      });
+    };
 
-  window.addEventListener('resize', updateCanvasSize);
-  updateCanvasSize();
+    window.addEventListener('resize', updateCanvasSize);
+    updateCanvasSize();
 
-  return () => window.removeEventListener('resize', updateCanvasSize);
-}, []);
+    return () => window.removeEventListener('resize', updateCanvasSize);
+  }, []);
 
   const handleCellChange = (level, rowIndex, colIndex) => {
     setGrids((prevGrids) => {
@@ -104,10 +103,48 @@ useEffect(() => {
     setShowClearConfirmDialog(false);
   };
 
+  const handleCopyLevel = () => {
+    setGrids((prevGrids) => ({
+      ...prevGrids,
+      [currentLevel]: [...prevGrids[sourceLevelToCopy]],
+    }));
+  };
+
+  const handleLoadPlot = async (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      try {
+        const content = await file.text();
+        const plotData = JSON.parse(content);
+        setGrids(plotData.grids);
+      } catch (error) {
+        console.error('Error loading plot:', error);
+        alert("Failed to load the plot. Please make sure it's a valid JSON file.");
+      }
+    }
+  };
+
+  const loadOfficialPlot = async (region, plotName) => {
+    try {
+      const response = await fetch(`/src/officialPlots/${region}/${plotName}.json`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch the official plot');
+      }
+      const plotData = await response.json();
+      setGrids(plotData.grids);
+    } catch (error) {
+      console.error('Error loading official plot:', error);
+      alert('Failed to load the official plot. Please try again later.');
+    }
+  };
+
   return (
     <div className='app'>
       <div className='toolbar'>
-        <div className='title'>V Rising Pltr</div>
+        <div className='title'>
+          V Rising <br />
+          Castle Planner
+        </div>
         <div className='terrain-buttons'>
           <div className='button-row'>
             {terrainTypes.slice(0, 5).map((terrain, index) => (
@@ -135,12 +172,39 @@ useEffect(() => {
           </div>
         </div>
         <div className='utility-buttons'>
-          <button onClick={handleSave} className='save-button'>
-            Save Plot
-          </button>
-          <button onClick={handleClearAll} className='clear-button'>
-            Clear All
-          </button>
+          <div className='button-row'>
+            <button onClick={handleSave} className='save-button'>
+              Save Plot
+            </button>
+            <button onClick={handleClearAll} className='clear-button'>
+              Clear All
+            </button>
+          </div>
+          <div className='button-row'>
+            <div className='copy-level-container'>
+              <select
+                value={sourceLevelToCopy}
+                onChange={(e) => setSourceLevelToCopy(e.target.value)}
+                className='copy-level-select'
+              >
+                {LEVELS.map((level) => (
+                  <option key={level} value={level}>
+                    {level}
+                  </option>
+                ))}
+              </select>
+              <button onClick={handleCopyLevel} className='copy-level-button'>
+                Copy Level
+              </button>
+            </div>
+            <input type='file' accept='.json' onChange={handleLoadPlot} style={{ display: 'none' }} id='load-plot-input' />
+            <button onClick={() => document.getElementById('load-plot-input').click()} className='load-button'>
+              Load Local Plot
+            </button>
+            <button onClick={() => loadOfficialPlot('DunleyFarmsWest', '11')} className='load-official-button'>
+              Load Official Plot
+            </button>
+          </div>
         </div>
       </div>
       <div className='level-selector'>
