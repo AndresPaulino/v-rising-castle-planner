@@ -60,13 +60,15 @@ npm start
 
 ## Contributing
 
-We welcome contributions to the V Rising Castle Planner! If you have suggestions for improvements or bug fixes, or have created an official plot layout, please follow these steps:
+We welcome contributions to the V Rising Castle Planner! If you have suggestions for improvements or bug fixes or have created an official plot layout, please follow these steps:
 
 1. Fork the repository.
 2. Create a new branch for your feature (`git checkout -b feature/AmazingFeature`).
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`).
 4. Push to the branch (`git push origin feature/AmazingFeature`).
 5. Open a Pull Request.
+
+For official plot layouts, create the layout, download it as a JSON file, and then upload the JSON file to the src/officialPlots directory with the number and region of the plot from the V Rising Official Plot Layouts spreadsheet (e.g. 1-Gloomrot_South.json).
 
 ## License
 
