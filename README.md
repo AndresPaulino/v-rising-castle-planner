@@ -82,6 +82,4 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## Contact
 
-Your Name - [@your_twitter](https://twitter.com/your_twitter) - email@example.com
-
-Project Link: [https://github.com/your-username/v-rising-castle-planner](https://github.com/your-username/v-rising-castle-planner)
+Project Link: [https://github.com/AndresPaulino/v-rising-castle-planner](https://github.com/AndresPaulino/v-rising-castle-planner)
