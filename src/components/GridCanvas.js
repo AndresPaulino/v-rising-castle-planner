@@ -1,8 +1,8 @@
-// src/components/GridCanvas.js
 import React, { useRef, useEffect, useState } from 'react';
 import { Stage, Layer, Rect, Text, Line } from 'react-konva';
 
 const CELL_SIZE = 20;
+const AXIS_PADDING = 40;
 
 const GridCanvas = ({ grid, currentLevel, onCellChange, width, height }) => {
   const stageRef = useRef(null);
@@ -12,38 +12,24 @@ const GridCanvas = ({ grid, currentLevel, onCellChange, width, height }) => {
   const [stagePosition, setStagePosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.code === 'Space') {
-        setIsPanning(true);
-        document.body.style.cursor = 'grab';
-      }
-    };
-    const handleKeyUp = (e) => {
-      if (e.code === 'Space') {
-        setIsPanning(false);
-        document.body.style.cursor = 'default';
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-    };
-  }, []);
-
-  useEffect(() => {
     if (stageRef.current) {
       const stage = stageRef.current;
-      const scale = Math.min(width / (grid[0].length * CELL_SIZE), height / (grid.length * CELL_SIZE));
-      const newWidth = grid[0].length * CELL_SIZE * scale;
-      const newHeight = grid.length * CELL_SIZE * scale;
-      const x = (width - newWidth) / 2;
-      const y = (height - newHeight) / 2;
-      stage.width(width);
-      stage.height(height);
+      const gridWidth = grid[0].length * CELL_SIZE;
+      const gridHeight = grid.length * CELL_SIZE;
+      const scaleX = (width - AXIS_PADDING * 2) / gridWidth;
+      const scaleY = (height - AXIS_PADDING * 2) / gridHeight;
+      const scale = Math.min(scaleX, scaleY, 1);
+
       setStageScale(scale);
-      setStagePosition({ x, y });
+
+      const scaledGridWidth = gridWidth * scale;
+      const scaledGridHeight = gridHeight * scale;
+
+      setStagePosition({
+        x: (width - scaledGridWidth) / 2,
+        y: (height - scaledGridHeight) / 2,
+      });
+
       stage.batchDraw();
     }
   }, [grid, width, height]);
@@ -52,15 +38,25 @@ const GridCanvas = ({ grid, currentLevel, onCellChange, width, height }) => {
     onCellChange(currentLevel, rowIndex, colIndex);
   };
 
+  const getGridCoordinates = (pointerPosition) => {
+    const stage = stageRef.current;
+    if (!stage) return { x: -1, y: -1 };
+
+    const transform = stage.getAbsoluteTransform().copy().invert();
+    const pos = transform.point(pointerPosition);
+
+    const x = Math.floor(pos.x / CELL_SIZE);
+    const y = grid.length - 1 - Math.floor(pos.y / CELL_SIZE);
+
+    return { x, y };
+  };
+
   const handleMouseDown = (e) => {
     if (!isPanning) {
       setIsDrawing(true);
-      const stage = e.target.getStage();
-      const pointerPosition = stage.getPointerPosition();
-      const x = Math.floor((pointerPosition.x - stage.x()) / (CELL_SIZE * stage.scaleX()));
-      const y = Math.floor((pointerPosition.y - stage.y()) / (CELL_SIZE * stage.scaleY()));
-      if (x >= 0 && x < grid[0].length && y >= 0 && y < grid.length) {
-        handleCellChange(y, x);
+      const pos = getGridCoordinates(e.target.getStage().getPointerPosition());
+      if (pos.x >= 0 && pos.x < grid[0].length && pos.y >= 0 && pos.y < grid.length) {
+        handleCellChange(pos.y, pos.x);
       }
     }
   };
@@ -71,12 +67,9 @@ const GridCanvas = ({ grid, currentLevel, onCellChange, width, height }) => {
 
   const handleMouseMove = (e) => {
     if (!isDrawing || isPanning) return;
-    const stage = e.target.getStage();
-    const pointerPosition = stage.getPointerPosition();
-    const x = Math.floor((pointerPosition.x - stage.x()) / (CELL_SIZE * stage.scaleX()));
-    const y = Math.floor((pointerPosition.y - stage.y()) / (CELL_SIZE * stage.scaleY()));
-    if (x >= 0 && x < grid[0].length && y >= 0 && y < grid.length) {
-      handleCellChange(y, x);
+    const pos = getGridCoordinates(e.target.getStage().getPointerPosition());
+    if (pos.x >= 0 && pos.x < grid[0].length && pos.y >= 0 && pos.y < grid.length) {
+      handleCellChange(pos.y, pos.x);
     }
   };
 
@@ -98,6 +91,45 @@ const GridCanvas = ({ grid, currentLevel, onCellChange, width, height }) => {
     setStagePosition(newPos);
   };
 
+  const renderAxisNumbers = () => {
+    const numbers = [];
+    // X-axis numbers (at the bottom)
+    for (let i = 0; i < grid[0].length; i++) {
+      numbers.push(
+        <Text
+          key={`x-${i}`}
+          x={i * CELL_SIZE}
+          y={grid.length * CELL_SIZE + 10}
+          width={CELL_SIZE}
+          height={AXIS_PADDING - 5}
+          text={i.toString()}
+          fontSize={10}
+          fill='black'
+          align='center'
+          verticalAlign='top'
+        />
+      );
+    }
+    // Y-axis numbers (starting from bottom)
+    for (let i = 0; i < grid.length; i++) {
+      numbers.push(
+        <Text
+          key={`y-${i}`}
+          x={-AXIS_PADDING - 10}
+          y={(grid.length - 1 - i) * CELL_SIZE}
+          width={AXIS_PADDING - 5}
+          height={CELL_SIZE}
+          text={i.toString()}
+          fontSize={10}
+          fill='black'
+          align='right'
+          verticalAlign='middle'
+        />
+      );
+    }
+    return numbers;
+  };
+
   const renderCell = (cell, x, y) => {
     if (!cell) return null;
 
@@ -105,11 +137,19 @@ const GridCanvas = ({ grid, currentLevel, onCellChange, width, height }) => {
 
     return (
       <React.Fragment key={`${x}-${y}`}>
-        <Rect x={x} y={y} width={CELL_SIZE} height={CELL_SIZE} fill={color} stroke='black' strokeWidth={0.5} />
+        <Rect
+          x={x * CELL_SIZE}
+          y={(grid.length - 1 - y) * CELL_SIZE}
+          width={CELL_SIZE}
+          height={CELL_SIZE}
+          fill={color}
+          stroke='black'
+          strokeWidth={0.5}
+        />
         {symbol && (
           <Text
-            x={x}
-            y={y}
+            x={x * CELL_SIZE}
+            y={(grid.length - 1 - y) * CELL_SIZE}
             width={CELL_SIZE}
             height={CELL_SIZE}
             text={symbol}
@@ -122,8 +162,8 @@ const GridCanvas = ({ grid, currentLevel, onCellChange, width, height }) => {
         )}
         {borderStyle === 'dashed' && (
           <Line
-            x={x}
-            y={y}
+            x={x * CELL_SIZE}
+            y={(grid.length - 1 - y) * CELL_SIZE}
             points={[0, 0, CELL_SIZE, 0, CELL_SIZE, CELL_SIZE, 0, CELL_SIZE, 0, 0]}
             stroke='black'
             strokeWidth={1}
@@ -145,9 +185,11 @@ const GridCanvas = ({ grid, currentLevel, onCellChange, width, height }) => {
       onWheel={handleWheel}
       draggable={isPanning}
       scale={{ x: stageScale, y: stageScale }}
-      position={stagePosition}
+      x={stagePosition.x}
+      y={stagePosition.y}
     >
       <Layer>
+        {renderAxisNumbers()}
         {/* Grid lines */}
         {grid[0].map((_, colIndex) => (
           <Line
@@ -178,9 +220,7 @@ const GridCanvas = ({ grid, currentLevel, onCellChange, width, height }) => {
           strokeWidth={0.5}
         />
       </Layer>
-      <Layer>
-        {grid.map((row, rowIndex) => row.map((cell, colIndex) => renderCell(cell, colIndex * CELL_SIZE, rowIndex * CELL_SIZE)))}
-      </Layer>
+      <Layer>{grid.map((row, rowIndex) => row.map((cell, colIndex) => renderCell(cell, colIndex, rowIndex)))}</Layer>
     </Stage>
   );
 };

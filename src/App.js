@@ -36,19 +36,20 @@ function App() {
   const [showClearConfirmDialog, setShowClearConfirmDialog] = useState(false);
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
 
-  useEffect(() => {
-    const updateCanvasSize = () => {
-      setCanvasSize({
-        width: window.innerWidth,
-        height: window.innerHeight - 175, // Adjust this value based on your toolbar and level selector height
-      });
-    };
+  
+useEffect(() => {
+  const updateCanvasSize = () => {
+    setCanvasSize({
+      width: window.innerWidth,
+      height: window.innerHeight - 150, // Adjust this value based on your toolbar and level selector height
+    });
+  };
 
-    window.addEventListener('resize', updateCanvasSize);
-    updateCanvasSize();
+  window.addEventListener('resize', updateCanvasSize);
+  updateCanvasSize();
 
-    return () => window.removeEventListener('resize', updateCanvasSize);
-  }, []);
+  return () => window.removeEventListener('resize', updateCanvasSize);
+}, []);
 
   const handleCellChange = (level, rowIndex, colIndex) => {
     setGrids((prevGrids) => {
