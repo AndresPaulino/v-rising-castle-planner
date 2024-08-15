@@ -5,8 +5,8 @@ import SaveDialog from './components/SaveDialog/SaveDialog';
 import ClearConfirmDialog from './components/ClearConfirmDialog/ClearConfirmDialog';
 import './App.css';
 
-const GRID_WIDTH = 25;
-const GRID_HEIGHT = 25;
+const GRID_WIDTH = 30;
+const GRID_HEIGHT = 30;
 const LEVELS = ['Ground Level', 'Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5', 'Level 6'];
 
 const terrainTypes = [
@@ -40,7 +40,7 @@ function App() {
     const updateCanvasSize = () => {
       setCanvasSize({
         width: window.innerWidth,
-        height: window.innerHeight - 150, // Adjust this value based on your toolbar and level selector height
+        height: window.innerHeight - 175, // Adjust this value based on your toolbar and level selector height
       });
     };
 
