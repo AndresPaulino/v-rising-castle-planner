@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useLayoutEffect, useState, useCallback } from 'react';
 import { Stage, Layer, Rect, Text, Line } from 'react-konva';
 
 const CELL_SIZE = 20;
@@ -11,10 +11,9 @@ const GridCanvas = ({ grid, currentLevel, onCellChange, width, height }) => {
   const [stageScale, setStageScale] = useState(1);
   const [stagePosition, setStagePosition] = useState({ x: 0, y: 0 });
   const [cursorStyle, setCursorStyle] = useState('default');
-  const [initializedCanvas, setInitializedCanvas] = useState(false);
 
   const initializeCanvas = useCallback(() => {
-    if (stageRef.current && !initializedCanvas) {
+    if (stageRef.current && grid && grid.length > 0 && grid[0].length > 0) {
       const stage = stageRef.current;
       const gridWidth = grid[0].length * CELL_SIZE;
       const gridHeight = grid.length * CELL_SIZE;
@@ -33,11 +32,10 @@ const GridCanvas = ({ grid, currentLevel, onCellChange, width, height }) => {
       });
 
       stage.batchDraw();
-      setInitializedCanvas(true);
     }
-  }, [grid, width, height, initializedCanvas]);
+  }, [grid, width, height]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     initializeCanvas();
   }, [initializeCanvas]);
 
