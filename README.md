@@ -1,70 +1,87 @@
-# Getting Started with Create React App
+# V Rising Castle Planner
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Overview
 
-## Available Scripts
+V Rising Castle Planner is an interactive web application designed to help players of the game V Rising plan and visualize their castle layouts. This tool allows users to create, save, and share castle designs across different levels and terrains.
 
-In the project directory, you can run:
+## Features
 
-### `npm start`
+- Interactive grid-based layout system
+- Multiple terrain types (Buildable, Water, Boundary, Slope, etc.)
+- Support for up to 7 levels (Ground Level + Levels 1-6)
+- Zoom and pan functionality for detailed planning
+- Save and load custom layouts
+- Export designs as JSON files for sharing
+- Pre-loaded official plot layouts
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Getting Started
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Prerequisites
 
-### `npm test`
+- Node.js (v14 or later recommended)
+- npm (comes with Node.js)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Installation
 
-### `npm run build`
+1. Clone the repository:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```
+git clone https://github.com/your-username/v-rising-castle-planner.git
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+2. Navigate to the project directory:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```
+cd v-rising-castle-planner
+```
 
-### `npm run eject`
+3. Install dependencies:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```
+npm install
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+4. Start the development server:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```
+npm start
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+5. Open your browser and visit `http://localhost:3000`
 
-## Learn More
+## Usage
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+1. Select a terrain type from the toolbar.
+2. Click or drag on the grid to place terrain.
+3. Use the level selector to switch between different castle levels.
+4. Zoom in/out using the mouse wheel and pan by holding the spacebar and dragging.
+5. Save your layout using the "Save Plot" button.
+6. Load existing layouts from the dropdown menu.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Contributing
 
-### Code Splitting
+We welcome contributions to the V Rising Castle Planner! If you have suggestions for improvements or bug fixes, or have created an official plot layout, please follow these steps:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+1. Fork the repository.
+2. Create a new branch for your feature (`git checkout -b feature/AmazingFeature`).
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`).
+4. Push to the branch (`git push origin feature/AmazingFeature`).
+5. Open a Pull Request.
 
-### Analyzing the Bundle Size
+## License
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
 
-### Making a Progressive Web App
+## Acknowledgments
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+- Thanks to the V Rising community for inspiration and support.
+- [V Rising](https://store.steampowered.com/app/109600/V_Rising/) for the game.
+- [V Rising Official Plot Layouts - by Phamy Caint](https://docs.google.com/spreadsheets/d/1OLBUKdDrF2NbDwPJ5M5kRsKu7_iEVi8CHelbGYg1fFk/edit?gid=921827187#gid=921827187) for the inspiration and the already made plot layouts.
+- [React](https://reactjs.org/) for the frontend framework.
+- [Konva](https://konvajs.org/) for the canvas-based drawing functionality.
 
-### Advanced Configuration
+## Contact
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+Your Name - [@your_twitter](https://twitter.com/your_twitter) - email@example.com
 
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Project Link: [https://github.com/your-username/v-rising-castle-planner](https://github.com/your-username/v-rising-castle-planner)
