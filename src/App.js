@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import GridCanvas from './components/GridCanvas';
 import SaveDialog from './components/SaveDialog/SaveDialog';
 import ClearConfirmDialog from './components/ClearConfirmDialog/ClearConfirmDialog';
+import LoadOfficialPlotDialog from './components/LoadOfficialPlotDialog/LoadOfficialPlotDialog';
 import './App.css';
 
 const GRID_WIDTH = 30;
@@ -33,6 +34,7 @@ function App() {
   const [currentTerrain, setCurrentTerrain] = useState(terrainTypes[0]);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [showClearConfirmDialog, setShowClearConfirmDialog] = useState(false);
+  const [showLoadOfficialPlotDialog, setShowLoadOfficialPlotDialog] = useState(false);
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
   const [sourceLevelToCopy, setSourceLevelToCopy] = useState(LEVELS[0]);
 
@@ -124,19 +126,24 @@ function App() {
     }
   };
 
-  const loadOfficialPlot = async (region, plotName) => {
+  const handleLoadOfficialPlot = () => {
+    setShowLoadOfficialPlotDialog(true);
+  };
+
+  const loadOfficialPlot = useCallback(async (region, plotName) => {
     try {
-      const response = await fetch(`/src/officialPlots/${region}/${plotName}.json`);
+      const response = await fetch(`/officialPlots/${region}/${plotName}.json`);
       if (!response.ok) {
-        throw new Error('Failed to fetch the official plot');
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
       const plotData = await response.json();
       setGrids(plotData.grids);
+      setShowLoadOfficialPlotDialog(false);
     } catch (error) {
       console.error('Error loading official plot:', error);
-      alert('Failed to load the official plot. Please try again later.');
+      alert(`Failed to load the official plot: ${error.message}`);
     }
-  };
+  }, []);
 
   return (
     <div className='app'>
@@ -201,7 +208,7 @@ function App() {
             <button onClick={() => document.getElementById('load-plot-input').click()} className='load-button'>
               Load Local Plot
             </button>
-            <button onClick={() => loadOfficialPlot('DunleyFarmsWest', '11')} className='load-official-button'>
+            <button onClick={handleLoadOfficialPlot} className='load-official-button'>
               Load Official Plot
             </button>
           </div>
@@ -228,6 +235,9 @@ function App() {
       {showSaveDialog && <SaveDialog onSave={handleSaveConfirm} onClose={() => setShowSaveDialog(false)} />}
       {showClearConfirmDialog && (
         <ClearConfirmDialog onConfirm={handleClearConfirm} onCancel={() => setShowClearConfirmDialog(false)} />
+      )}
+      {showLoadOfficialPlotDialog && (
+        <LoadOfficialPlotDialog onLoad={loadOfficialPlot} onClose={() => setShowLoadOfficialPlotDialog(false)} />
       )}
     </div>
   );

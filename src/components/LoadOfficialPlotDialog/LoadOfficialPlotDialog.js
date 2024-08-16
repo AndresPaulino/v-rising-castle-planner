@@ -1,20 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import './LoadOfficialPlotDialog.css';
-import officialPlotsConfig from '../../officialPlots/officialPlotsConfig.json';
-
-const regions = Object.keys(officialPlotsConfig);
 
 function LoadOfficialPlotDialog({ onLoad, onClose }) {
-  const [selectedRegion, setSelectedRegion] = useState(regions[0]);
+  const [officialPlotsConfig, setOfficialPlotsConfig] = useState({});
+  const [selectedRegion, setSelectedRegion] = useState('');
   const [selectedPlot, setSelectedPlot] = useState('');
 
   useEffect(() => {
-    if (selectedRegion && officialPlotsConfig[selectedRegion].length > 0) {
+    fetch('/officialPlots/officialPlotsConfig.json')
+      .then((response) => response.json())
+      .then((data) => {
+        setOfficialPlotsConfig(data);
+        const firstRegion = Object.keys(data)[0];
+        setSelectedRegion(firstRegion);
+        setSelectedPlot(data[firstRegion][0] || '');
+      })
+      .catch((error) => console.error('Error loading officialPlotsConfig:', error));
+  }, []);
+
+  useEffect(() => {
+    if (selectedRegion && officialPlotsConfig[selectedRegion]?.length > 0) {
       setSelectedPlot(officialPlotsConfig[selectedRegion][0]);
     } else {
       setSelectedPlot('');
     }
-  }, [selectedRegion]);
+  }, [selectedRegion, officialPlotsConfig]);
 
   const handleLoad = () => {
     if (selectedRegion && selectedPlot) {
@@ -28,19 +38,21 @@ function LoadOfficialPlotDialog({ onLoad, onClose }) {
     <div className='load-dialog-overlay'>
       <div className='load-dialog'>
         <h2>Load Official Plot</h2>
+        <label htmlFor="region-select">Region:</label>
         <select value={selectedRegion} onChange={(e) => setSelectedRegion(e.target.value)}>
-          {regions.map((region) => (
+          {Object.keys(officialPlotsConfig).map((region) => (
             <option key={region} value={region}>
               {region}
             </option>
           ))}
         </select>
+        <label htmlFor="plot-select">Plot:</label>
         <select value={selectedPlot} onChange={(e) => setSelectedPlot(e.target.value)}>
-          {officialPlotsConfig[selectedRegion].map((plot) => (
+          {officialPlotsConfig[selectedRegion]?.map((plot) => (
             <option key={plot} value={plot}>
               {plot}
             </option>
-          ))}
+          )) || <option value=''>No plots available</option>}
         </select>
         <div className='load-dialog-buttons'>
           <button onClick={handleLoad}>Load</button>
